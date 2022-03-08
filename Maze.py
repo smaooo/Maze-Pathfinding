@@ -1,6 +1,7 @@
+
 import pygame
 from random import choice
-import os
+
 
 class Cell(pygame.sprite.Sprite):
     w, h = 16, 16
@@ -30,6 +31,17 @@ class Wall(Cell):
         self.image.fill((0, 0, 0))
         self.type = 0
 
+class StartPoint(Cell):
+    def __init__(self, x, y, maze):
+        super().__init__(x, y, maze)
+        self.image.fill((0,255,0))
+        self.type = 1
+
+class EndPoint(Cell):
+    def __init__(self, x, y, maze):
+        super().__init__(x, y, maze)
+        self.image.fill((255,0,0))
+        self.type = 2
 
 class Maze:
     def __init__(self, size):
@@ -37,12 +49,11 @@ class Maze:
         self.grid = [[Wall(x, y, self) for y in range(self.h)] for x in range(self.w)]
         pygame.init()
         scr_inf = pygame.display.Info()
-        os.environ['SDL_VIDEO_WINDOW_POS'] = '{}, {}'.format(scr_inf.current_w // 2 - size[0] // 2,
-                                                         scr_inf.current_h // 2 - size[1] // 2)
+       
         self.screen = pygame.display.set_mode(size)
         pygame.display.set_caption('Maze')
         self.screen.fill((0, 0, 0))
-
+        self.wall = []
 
         self.generate(self.screen, False)
 
@@ -57,6 +68,67 @@ class Maze:
             for cell in row:
                 cell.draw(screen)
 
+    def setStartEnd(self, point: int):
+        
+        frange1 = 0 if point == 0 else self.w
+        erange1 = 0 if point == 1 else self.w
+        frange2 = 0 if point == 0 else self.h
+        erange2 = 0 if point == 1 else self.h
+        step = 1 if point == 0 else -1 
+        increment = 1 if point == 1 else 0
+        print(str(frange1) + ' '+ str(erange1))
+        print(str(frange2) + ' '+ str(erange2))
+        for x in range(frange1 - increment,erange1, step):
+            for y in range(frange2 - increment, erange2, step):
+                if (type(self.grid[x][y]) is not Wall and type(self.grid[x][y]) is not StartPoint):
+                    if (type(self.grid[x][y+1]) is Wall and
+                    type(self.grid[x][y-1]) is Wall and 
+                    type(self.grid[x-1][y]) is Wall):
+                        if (point == 0):
+                            self.grid[x][y] = StartPoint(x,y,self)
+                            print('Start: ' + str(x) + ' ' + str(y))
+                            self.setStartEnd(1)
+                        elif (point == 1) :
+                            print('End: ' + str(x) + ' ' + str(y))
+                            self.grid[x][y] = EndPoint(x,y,self)
+
+                        return
+                    elif (type(self.grid[x-1][y]) is Wall and
+                    type(self.grid[x][y-1]) is Wall and
+                    type(self.grid[x+1][y]) is Wall):
+                        if (point == 0):
+                            self.grid[x][y] = StartPoint(x,y,self)
+                            print('Start: ' + str(x) + ' ' + str(y))
+                            self.setStartEnd(1)
+                        elif (point == 1) :
+                            print('End: ' + str(x) + ' ' + str(y))
+                            self.grid[x][y] = EndPoint(x,y,self)
+                        return
+                    elif (type(self.grid[x-1][y]) is Wall and
+                    type(self.grid[x][y+1]) is Wall and
+                    type(self.grid[x+1][y]) is Wall):
+                        if (point == 0):
+                            print('Start: ' + str(x) + ' ' + str(y))
+                            self.grid[x][y] = StartPoint(x,y,self)
+                            self.setStartEnd(1)
+                        elif (point == 1) :
+                            print('End: ' + str(x) + ' ' + str(y))
+                            self.grid[x][y] = EndPoint(x,y,self)
+                        return
+                    elif (type(self.grid[x][y+1]) is Wall and
+                    type(self.grid[x+1][y]) is Wall and
+                    type(self.grid[x][y+1]) is Wall):
+                        if (point == 0):
+                            print('Start: ' + str(x) + ' ' + str(y))
+                            self.grid[x][y] = StartPoint(x,y,self)
+                            self.setStartEnd(1)
+                        elif (point == 1) :
+                            print('End: ' + str(x) + ' ' + str(y))
+                            self.grid[x][y] = EndPoint(x,y,self)
+                        return
+            
+        
+        
     def generate(self, screen=None, animate=False):
         unvisited = [c for r in self.grid for c in r if c.x % 2 and c.y % 2]
         cur = unvisited.pop()
@@ -66,11 +138,13 @@ class Maze:
             try:
                 n = choice([c for c in map(lambda x: self.get(*x), cur.nbs) if c in unvisited])
                 stack.append(cur)
+                
                 nx, ny = cur.x - (cur.x - n.x) // 2, cur.y - (cur.y - n.y) // 2
                 self.grid[nx][ny] = Cell(nx, ny, self)
                 self.grid[cur.x][cur.y] = Cell(cur.x, cur.y, self)
                 cur = n
                 unvisited.remove(n)
+
 
                 if animate:
                     self.draw(screen)
@@ -79,6 +153,9 @@ class Maze:
             except IndexError:
                 if stack:
                     cur = stack.pop()
+        self.setStartEnd(0)
         if not animate:
             self.draw(screen)
             pygame.display.update()
+
+
