@@ -1,12 +1,16 @@
-
 import pygame
 from random import choice
+from pygame import Surface
+from typing import List, Tuple
+import os
+# https://gist.github.com/FrankRuis/4bad6a988861f38cf53b86c185fc50c3
+
 
 
 class Cell(pygame.sprite.Sprite):
     w, h = 16, 16
 
-    def __init__(self, x, y, maze):
+    def __init__(self, x : int, y : int, maze) -> None: 
         pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.Surface([self.w, self.h])
@@ -21,54 +25,70 @@ class Cell(pygame.sprite.Sprite):
         self.nbs = [(x + nx, y + ny) for nx, ny in ((-2, 0), (0, -2), (2, 0), (0, 2))
                     if 0 <= x + nx < maze.w and 0 <= y + ny < maze.h]
 
-    def draw(self, screen):
+    def draw(self, screen: Surface) -> None:
         screen.blit(self.image, self.rect)
 
 
 class Wall(Cell):
-    def __init__(self, x, y, maze):
+    def __init__(self, x: int, y: int, maze) -> None:
         super(Wall, self).__init__(x, y, maze)
         self.image.fill((0, 0, 0))
         self.type = 0
 
 class StartPoint(Cell):
-    def __init__(self, x, y, maze):
+    def __init__(self, x: int, y: int, maze) -> None:
         super().__init__(x, y, maze)
         self.image.fill((0,255,0))
         self.type = 1
 
 class EndPoint(Cell):
-    def __init__(self, x, y, maze):
+    def __init__(self, x: int, y: int, maze) -> None:
         super().__init__(x, y, maze)
         self.image.fill((255,0,0))
         self.type = 2
 
+class Searching(Cell):
+    def __init__(self, x: int, y: int, maze) -> None:
+        super().__init__(x, y, maze)
+        self.image.fill((0,0,255))
+        self.type = 2
+
+class Path(Cell):
+    def __init__(self, x: int, y: int, maze) -> None:
+        super().__init__(x, y, maze)
+        self.image.fill((255,0,0))
+        self.type = 3
+
 class Maze:
-    def __init__(self, size):
+    def __init__(self, size) -> None:
         self.w, self.h = size[0] // Cell.w, size[1] // Cell.h
         self.grid = [[Wall(x, y, self) for y in range(self.h)] for x in range(self.w)]
+        self.start: Tuple(int,int)
+        self.end: Tuple(int,int)
         pygame.init()
+        self.clock = pygame.time.Clock()
         scr_inf = pygame.display.Info()
-       
+        os.environ['SDL_VIDEO_WINDOW_POS'] = '{}, {}'.format(scr_inf.current_w // 2 - size[0] // 2,
+                                                         scr_inf.current_h // 2 - size[1] // 2)
         self.screen = pygame.display.set_mode(size)
         pygame.display.set_caption('Maze')
         self.screen.fill((0, 0, 0))
         self.wall = []
-
+        print(self.grid[0][0])
         self.generate(self.screen, False)
 
-    def get(self, x, y):
+    def get(self, x : int, y : int ) -> List: 
         return self.grid[x][y]
 
-    def place_wall(self, x, y):
+    def place_wall(self, x : int, y : int) -> None:
         self.grid[x][y] = Wall(x, y, self)
 
-    def draw(self, screen):
+    def draw(self, screen: Surface) -> None:
         for row in self.grid:
             for cell in row:
                 cell.draw(screen)
 
-    def setStartEnd(self, point: int):
+    def setStartEnd(self, point: int) -> None:
         
         frange1 = 0 if point == 0 else self.w
         erange1 = 0 if point == 1 else self.w
@@ -86,10 +106,12 @@ class Maze:
                     type(self.grid[x-1][y]) is Wall):
                         if (point == 0):
                             self.grid[x][y] = StartPoint(x,y,self)
+                            self.start = (x,y)
                             print('Start: ' + str(x) + ' ' + str(y))
                             self.setStartEnd(1)
                         elif (point == 1) :
                             print('End: ' + str(x) + ' ' + str(y))
+                            self.end = (x,y)
                             self.grid[x][y] = EndPoint(x,y,self)
 
                         return
@@ -98,10 +120,13 @@ class Maze:
                     type(self.grid[x+1][y]) is Wall):
                         if (point == 0):
                             self.grid[x][y] = StartPoint(x,y,self)
+                            self.start = (x,y)
+
                             print('Start: ' + str(x) + ' ' + str(y))
                             self.setStartEnd(1)
                         elif (point == 1) :
                             print('End: ' + str(x) + ' ' + str(y))
+                            self.end = (x,y)
                             self.grid[x][y] = EndPoint(x,y,self)
                         return
                     elif (type(self.grid[x-1][y]) is Wall and
@@ -110,9 +135,11 @@ class Maze:
                         if (point == 0):
                             print('Start: ' + str(x) + ' ' + str(y))
                             self.grid[x][y] = StartPoint(x,y,self)
+                            self.start = (x,y)
                             self.setStartEnd(1)
                         elif (point == 1) :
                             print('End: ' + str(x) + ' ' + str(y))
+                            self.end = (x,y)
                             self.grid[x][y] = EndPoint(x,y,self)
                         return
                     elif (type(self.grid[x][y+1]) is Wall and
@@ -120,16 +147,54 @@ class Maze:
                     type(self.grid[x][y+1]) is Wall):
                         if (point == 0):
                             print('Start: ' + str(x) + ' ' + str(y))
+                            self.start = (x,y)
                             self.grid[x][y] = StartPoint(x,y,self)
                             self.setStartEnd(1)
                         elif (point == 1) :
                             print('End: ' + str(x) + ' ' + str(y))
+                            self.end = (x,y)
                             self.grid[x][y] = EndPoint(x,y,self)
                         return
             
+    def update(self, cell: Cell):
         
+        cell.draw(self.screen)
+        pygame.display.update()
+        pygame.time.wait(10)
+        pygame.event.pump()
+
+    def draw_path(self, path):
+        for p in path:
+            self.grid[p[0]][p[1]] = Path(p[0],p[1], self)
+            self.grid[p[0]][p[1]].draw(self.screen)
+            pygame.display.update()
+            pygame.time.wait(10)
+            pygame.event.pump()
+
+    def get_Cells(self):
+        cells = []
+        for x in range(self.w):
+            for y in range(self.h):
+                if type(self.grid[x][y]) is not Wall:
+                    cells.append((x,y))
+
+        return cells
+
+    def get_neighbors(self, cell: Tuple[int,int]) -> List[Tuple[int,int]]:
+        neighbors: list = []
+        if cell[0] - 1 >= 0 and type(self.grid[cell[0]-1][cell[1]]) is not Wall:
+            neighbors.append((cell[0] - 1, cell[1]))
+        if cell[0] + 1 < self.w and type(self.grid[cell[0]+1][cell[1]]) is not Wall:
+            neighbors.append((cell[0] + 1, cell[1]))
+        if cell[1] - 1 >= 0 and type(self.grid[cell[0]][cell[1]-1]) is not Wall:
+            neighbors.append((cell[0], cell[1] - 1))
+        if cell[1] + 1 >= 0 and type(self.grid[cell[0]][cell[1]+1]) is not Wall:
+            neighbors.append((cell[0], cell[1] + 1))
         
-    def generate(self, screen=None, animate=False):
+        return neighbors
+
+        
+    def generate(self, screen: Surface=None, animate: bool=False) -> None:
         unvisited = [c for r in self.grid for c in r if c.x % 2 and c.y % 2]
         cur = unvisited.pop()
         stack = []
@@ -157,5 +222,4 @@ class Maze:
         if not animate:
             self.draw(screen)
             pygame.display.update()
-
 
