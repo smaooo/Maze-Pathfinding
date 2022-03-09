@@ -1,3 +1,4 @@
+from ctypes import sizeof
 import pygame
 from random import choice
 from pygame import Surface
@@ -72,7 +73,7 @@ class Maze:
         os.environ['SDL_VIDEO_WINDOW_POS'] = '{}, {}'.format(scr_inf.current_w // 2 - size[0] // 2,
                                                          scr_inf.current_h // 2 - size[1] // 2)
         self.screen = pygame.display.set_mode(size)
-        
+        self.size = size
         pygame.display.set_caption('Maze')
         self.screen.fill((0, 0, 0))
         self.wall = []
@@ -177,7 +178,7 @@ class Maze:
         self.draw(self.screen)
         pygame.time.wait(100)
                     
-    def draw_path(self, path):
+    def draw_path(self, path, time):
         for p in path:
             if p != self.start and p != self.end:
                 self.grid[p[0]][p[1]] = Path(p[0],p[1], self)
@@ -185,6 +186,19 @@ class Maze:
                 pygame.display.update()
                 # pygame.time.wait(1)
                 pygame.event.pump()
+
+        font = pygame.font.Font('freesansbold.ttf', 32)
+ 
+        green = (0, 255, 0)
+        blue = (0, 0, 128)
+        text = font.render(str(time), True, green, blue)
+        textRect = text.get_rect()
+
+
+        textRect.center = (self.size[0] // 2, self.size[1] // 2)
+
+        self.screen.blit(text, textRect)
+        pygame.display.update()
 
     def get_Cells(self):
         cells = []

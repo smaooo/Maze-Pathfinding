@@ -2,12 +2,13 @@ from dis import dis
 from Maze import *
 from math import inf, sqrt
 from typing import Tuple, List, Dict
-
+import time
 # https://www.udacity.com/blog/2021/10/implementing-dijkstras-algorithm-in-python.html
 
 
 def Dij_FindPath(maze : Maze):
 
+    startTime = time.time()
     queue = []
     dist = {}
     prev = {}
@@ -49,7 +50,8 @@ def Dij_FindPath(maze : Maze):
         while current is not None:
             shortestPath.insert(0, current)
             current = prev[current]
-    maze.draw_path(shortestPath)
+    endTime = time.time()
+    maze.draw_path(shortestPath, endTime - startTime)
     print(shortestPath)
     
 def calc_distance(current: Tuple[int,int], cell: Tuple[int,int]) -> float:

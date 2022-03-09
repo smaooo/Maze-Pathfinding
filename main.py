@@ -5,7 +5,7 @@ import pygame
 from pygame.locals import *
 import pygame_gui
 
-WINSIZE = (Cell.w * 41, Cell.h * 41)
+WINSIZE = (Cell.w * 51, Cell.h * 51)
 
 if __name__ == '__main__':
 

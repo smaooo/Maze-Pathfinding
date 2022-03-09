@@ -1,10 +1,12 @@
 from math import inf, sqrt
 from operator import ne
 from Maze import *
+import time
 
-#https://www.geeksforgeeks.org/a-search-algorithm/
+#https://isaaccomputerscience.org/concepts/dsa_search_a_star?examBoard=all&stage=all
 
 def AStar_FindPath(maze: Maze) -> None:
+    startTime = time.time()
     visited = []
     unvisited = []
     gScores = {}
@@ -54,7 +56,9 @@ def AStar_FindPath(maze: Maze) -> None:
         while current is not None:
             shortestPath.insert(0, current)
             current = prevs[current]
-    maze.draw_path(shortestPath)
+
+    endTime = time.time()
+    maze.draw_path(shortestPath, endTime - startTime)
     print(shortestPath)
 
 
