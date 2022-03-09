@@ -1,8 +1,8 @@
-from time import perf_counter
+from dis import dis
 from Maze import *
 from math import inf, sqrt
 from typing import Tuple, List, Dict
-from time import sleep
+
 # https://www.udacity.com/blog/2021/10/implementing-dijkstras-algorithm-in-python.html
 
 
@@ -24,13 +24,15 @@ def Dij_FindPath(maze : Maze):
     current = start
 
     while queue:
-       
-        shortest = inf
-        for q in queue:
-           if dist[q] < shortest:
-               current = q
-        maze.grid[current[0]][current[1]] = Searching(current[0],current[1], maze)
-        maze.update(maze.grid[current[0]][current[1]])
+        dist = {k: v for k, v in sorted(dist.items(), key=lambda item: item[1])}
+        
+        for k in dist.keys():
+            if k in queue:
+                current = k
+                break
+        if current != start and current != end:
+            maze.grid[current[0]][current[1]] = Searching(current[0],current[1], maze)
+            maze.update(maze.grid[current[0]][current[1]])
         queue.remove(current)
         neighbors = maze.get_neighbors(current)
         for neighbor in neighbors:
@@ -54,6 +56,3 @@ def calc_distance(current: Tuple[int,int], cell: Tuple[int,int]) -> float:
     distance = sqrt((cell[0] - current[0])**2 + (cell[1] - current[1]) ** 2)
     return distance
     
-def calcFinalPath(maze: Maze, path: Dict):
-
-    pass

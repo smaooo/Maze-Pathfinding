@@ -3,6 +3,7 @@ from random import choice
 from pygame import Surface
 from typing import List, Tuple
 import os
+import pygame_gui
 # https://gist.github.com/FrankRuis/4bad6a988861f38cf53b86c185fc50c3
 
 
@@ -71,6 +72,7 @@ class Maze:
         os.environ['SDL_VIDEO_WINDOW_POS'] = '{}, {}'.format(scr_inf.current_w // 2 - size[0] // 2,
                                                          scr_inf.current_h // 2 - size[1] // 2)
         self.screen = pygame.display.set_mode(size)
+        
         pygame.display.set_caption('Maze')
         self.screen.fill((0, 0, 0))
         self.wall = []
@@ -87,6 +89,7 @@ class Maze:
         for row in self.grid:
             for cell in row:
                 cell.draw(screen)
+
 
     def setStartEnd(self, point: int) -> None:
         
@@ -160,16 +163,28 @@ class Maze:
         
         cell.draw(self.screen)
         pygame.display.update()
-        pygame.time.wait(10)
+        # pygame.time.wait(1)
         pygame.event.pump()
 
+    def reset(self):
+        for x in range(self.w):
+            for y in range(self.h):
+                c = self.grid[x][y]
+                if type(c) is not Wall and type(c) is not StartPoint and type(c) is not EndPoint:
+                    self.grid[x][y] = Cell(x,y,self)
+        self.grid[self.start[0]][self.start[1]] = StartPoint(self.start[0], self.start[1], self)
+        self.grid[self.end[0]][self.end[1]] = EndPoint(self.end[0], self.end[1], self)
+        self.draw(self.screen)
+        pygame.time.wait(100)
+                    
     def draw_path(self, path):
         for p in path:
-            self.grid[p[0]][p[1]] = Path(p[0],p[1], self)
-            self.grid[p[0]][p[1]].draw(self.screen)
-            pygame.display.update()
-            pygame.time.wait(10)
-            pygame.event.pump()
+            if p != self.start and p != self.end:
+                self.grid[p[0]][p[1]] = Path(p[0],p[1], self)
+                self.grid[p[0]][p[1]].draw(self.screen)
+                pygame.display.update()
+                # pygame.time.wait(1)
+                pygame.event.pump()
 
     def get_Cells(self):
         cells = []
@@ -222,4 +237,4 @@ class Maze:
         if not animate:
             self.draw(screen)
             pygame.display.update()
-
+            
