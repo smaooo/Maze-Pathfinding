@@ -88,7 +88,12 @@ def AStar_FindPath(maze: Maze) -> None:
 
 # calculate the distance between current cell and the given cell
 def calc_distance(current: Tuple[int,int], cell: Tuple[int,int]) -> float:
+    # Euclidean 
     distance = sqrt((cell[0] - current[0])**2 + (cell[1] - current[1]) ** 2)
+    # Manhattan
+    # distance = (cell[0] - current[0]) + (cell[1] - current[1])
+    # Diagonal
+    # distance = max([cell[0] - current[0], cell[1] - current[1]])
     return distance
     
 

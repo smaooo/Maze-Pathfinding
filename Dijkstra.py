@@ -27,7 +27,7 @@ def Dij_FindPath(maze : Maze):
 
     # as long as there's cells in the unvisited queue    
     while queue:
-        # order the distance dictionary by value ascending
+        # sort the distance dictionary by value ascending
         dist = {k: v for k, v in sorted(dist.items(), key=lambda item: item[1])}
         
         # if the minimum value in distance dictionary is in the queue set that as current cell

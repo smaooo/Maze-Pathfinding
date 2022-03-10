@@ -5,7 +5,7 @@ import pygame
 from pygame.locals import *
 
 # define the window size
-WINSIZE = (Cell.w * 91, Cell.h * 51)
+WINSIZE = (Cell.w * 51, Cell.h * 51)
 
 if __name__ == '__main__':
 
