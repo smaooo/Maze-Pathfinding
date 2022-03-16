@@ -127,7 +127,8 @@ class Maze:
                     if (type(self.grid[x][y+1]) is Wall and
                     type(self.grid[x][y-1]) is Wall and 
                     type(self.grid[x-1][y]) is Wall):
-                        
+                        self.set_cell(x,y,point)
+
                         return
                     # if only the cell is not blocked from top
                     elif (type(self.grid[x-1][y]) is Wall and
@@ -238,7 +239,7 @@ class Maze:
     def generate(self, screen: Surface=None) -> None:
         # create a list of all of the unvisited cells
         unvisited = [c for r in self.grid for c in r if c.x % 2 and c.y % 2]
-        # set the first element in unvisited list as current
+        # set the last element in unvisited list as current
         cur = unvisited.pop()
         # stack to hold current and visit the neighbors
         stack = []
