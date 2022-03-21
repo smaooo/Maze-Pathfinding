@@ -14,3 +14,6 @@ Keyboard Shortcuts:
   Press 'R' to generate a new Maze
   
   Press 'Esc' to terminate the program
+
+
+By changing the "WINSIZE" variable in main.py, it is possible to change the maze's size.
