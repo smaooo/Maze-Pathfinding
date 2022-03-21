@@ -4,8 +4,11 @@ To use, run the "main.py".
 
 Keyboard Shortcuts:
   Press '1' for Dijkstra's Algorithm
+  
   Press '2' for A* Algorithm with Euclidean distance heuristic
+  
   Press '3' for A* Algorithm with Manhattan distance heuristic
+  
   Press '4' for A* Algorithm with Diagonal distance heuristic
   
   Press 'R' to generate a new Maze
