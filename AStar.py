@@ -5,7 +5,7 @@ import time
 
 #https://isaaccomputerscience.org/concepts/dsa_search_a_star?examBoard=all&stage=all
 
-def AStar_FindPath(maze: Maze) -> None:
+def AStar_FindPath(maze: Maze, heuristic: int) -> None:
     # set the start time
     startTime = time.time()
     visited = [] # list of visited cells
@@ -27,7 +27,7 @@ def AStar_FindPath(maze: Maze) -> None:
     # set start's cell g-score to 0
     gScores[start] = 0
     # f score from start to end
-    fScores[start] = calc_distance(start, end)
+    fScores[start] = calc_distance(start, end, heuristic)
 
     current = None
 
@@ -55,13 +55,13 @@ def AStar_FindPath(maze: Maze) -> None:
                 # if neighbor is not visited
                 if n not in visited:
                     # calculate a its g-score
-                    g = calc_distance(start, n)
+                    g = calc_distance(start, n, heuristic)
                     # if the new g-score is less than g-score in the dictionary and the neighbor is not visited
                     if g < gScores[n] and n in unvisited:
                         # update its g-score
                         gScores[n] = g
                         # update its f-score
-                        fScores[n] = g + calc_distance(n, end)
+                        fScores[n] = g + calc_distance(n, end, heuristic)
                         # set current cell as its parent
                         prevs[n] = current
             # add current cell to visited
@@ -87,13 +87,16 @@ def AStar_FindPath(maze: Maze) -> None:
     print(shortestPath)
 
 # calculate the distance between current cell and the given cell
-def calc_distance(current: Tuple[int,int], cell: Tuple[int,int]) -> float:
-    # Euclidean 
-    distance = sqrt((cell[0] - current[0])**2 + (cell[1] - current[1]) ** 2)
-    # Manhattan
-    # distance = (cell[0] - current[0]) + (cell[1] - current[1])
-    # Diagonal
-    # distance = max([cell[0] - current[0], cell[1] - current[1]])
+def calc_distance(current: Tuple[int,int], cell: Tuple[int,int], hu: int) -> float:
+    if hu == 0:
+        # Euclidean 
+        distance = sqrt((cell[0] - current[0])**2 + (cell[1] - current[1]) ** 2)
+    elif hu == 1:
+        # Manhattan
+        distance = (cell[0] - current[0]) + (cell[1] - current[1])
+    elif hu == 2:
+        # Diagonal
+        distance = max([cell[0] - current[0], cell[1] - current[1]])
     return distance
     
 

@@ -29,7 +29,17 @@ if __name__ == '__main__':
                 # reset maze if it's already planned for a path
                 maze.reset()
                 # run the algorithm
-                AStar_FindPath(maze)
+                AStar_FindPath(maze, 0)
+            elif e.type == KEYUP and e.key == K_3:
+                # reset maze if it's already planned for a path
+                maze.reset()
+                # run the algorithm
+                AStar_FindPath(maze, 1)
+            elif e.type == KEYUP and e.key == K_4:
+                # reset maze if it's already planned for a path
+                maze.reset()
+                # run the algorithm
+                AStar_FindPath(maze, 2)
             # generate a new maze
             elif e.type == KEYUP and e.key == K_r:
                 maze = Maze(WINSIZE)
